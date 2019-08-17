@@ -57,19 +57,21 @@ fn model(app: &App) -> Model {
 
         _window }
 }
+//
+// fn draw_rhombe(draw: &app::Draw, model: &mut Model) {
+//     // let draw = app.draw();
+//
+//     draw.line().start(model.top_pt).end(model.right_pt).color(RED);
+//     draw.line().start(model.right_pt).end(model.bottom_pt).color(RED);
+//     draw.line().start(model.bottom_pt).end(model.left_pt).color(RED);
+//     draw.line().start(model.left_pt).end(model.top_pt).color(RED);
+//     draw.line().start(model.mid_top_right_pt).end(model.mid_bottom_left_pt).color(RED);
+//     draw.line().start(model.mid_bottom_right_pt).end(model.mid_top_left_pt).color(RED);
+//
+//     println!("rap");
+// }
 
-fn draw_rhombe(app: &App, model: &mut Model) {
-    let draw = app.draw();
-
-    draw.line().start(model.top_pt).end(model.right_pt).color(RED);
-    draw.line().start(model.right_pt).end(model.bottom_pt).color(RED);
-    draw.line().start(model.bottom_pt).end(model.left_pt).color(RED);
-    draw.line().start(model.left_pt).end(model.top_pt).color(RED);
-    draw.line().start(model.mid_top_right_pt).end(model.mid_bottom_left_pt).color(RED);
-    draw.line().start(model.mid_bottom_right_pt).end(model.mid_top_left_pt).color(RED);
-}
-
-fn contract_to(app: &App, model: &mut Model, left_point: Vector2) {
+fn contract_to(model: &mut Model, left_point: Vector2) {
     let new_top = left_point + (model.top_pt - left_point) / 2.0;
     let new_bottom = left_point + (model.bottom_pt - left_point) / 2.0;
     let new_right = left_point + (model.right_pt - left_point) / 2.0;
@@ -84,7 +86,7 @@ fn contract_to(app: &App, model: &mut Model, left_point: Vector2) {
     model.mid_bottom_right_pt = new_right + (new_bottom - new_right) / 2.0;
     model.center_pt = left_point + (new_right - left_point) / 2.0;
 
-    draw_rhombe(app, model);
+    // draw_rhombe(draw, model);
 }
 
 // fn current_monitor() {
@@ -94,34 +96,34 @@ fn contract_to(app: &App, model: &mut Model, left_point: Vector2) {
 fn event(_app: &App, _model: &mut Model, event: WindowEvent) {
     match event {
         KeyPressed(_key) => {
-            draw_rhombe(_app, _model);
             _app.main_window().set_cursor_position(100, 200).unwrap();
         }
         KeyReleased(_key) => {
-            contract_to(_app, _model, _model.left_pt);
+            contract_to(_model, _model.left_pt);
             _app.main_window().set_cursor_position(200, 100).unwrap();
         }
-        // Mouse events
-        MouseMoved(_pos) => {}
-        MousePressed(_button) => {}
-        MouseReleased(_button) => {}
-        MouseWheel(_amount, _phase) => {}
-        MouseEntered => {}
-        MouseExited => {}
-
-        // Touch events
-        Touch(_touch) => {}
-        TouchPressure(_pressure) => {}
-
-        // Window events
-        Moved(_pos) => {}
-        Resized(_size) => {}
-        HoveredFile(_path) => {}
-        DroppedFile(_path) => {}
-        HoveredFileCancelled => {}
-        Focused => {}
-        Unfocused => {}
-        Closed => {}
+        // // Mouse events
+        // MouseMoved(_pos) => {}
+        // MousePressed(_button) => {}
+        // MouseReleased(_button) => {}
+        // MouseWheel(_amount, _phase) => {}
+        // MouseEntered => {}
+        // MouseExited => {}
+        //
+        // // Touch events
+        // Touch(_touch) => {}
+        // TouchPressure(_pressure) => {}
+        //
+        // // Window events
+        // Moved(_pos) => {}
+        // Resized(_size) => {}
+        // HoveredFile(_path) => {}
+        // DroppedFile(_path) => {}
+        // HoveredFileCancelled => {}
+        // Focused => {}
+        // Unfocused => {}
+        // Closed => {}
+        _other => {}
     }
 
 }
@@ -136,10 +138,19 @@ fn event(_app: &App, _model: &mut Model, event: WindowEvent) {
 // }
 
 
-fn view(app: &App, _model: &Model, frame: &Frame) {
+fn view(app: &App, model: &Model, frame: &Frame) {
     let draw = app.draw();
 
-    draw.background().color(rgba(0.0, 0.0, 0.0, 0.05));
+    draw.background().color(rgb(0.0, 0.0, 0.0));
+
+    draw.line().start(model.top_pt).end(model.right_pt).color(RED);
+    draw.line().start(model.right_pt).end(model.bottom_pt).color(RED);
+    draw.line().start(model.bottom_pt).end(model.left_pt).color(RED);
+    draw.line().start(model.left_pt).end(model.top_pt).color(RED);
+    draw.line().start(model.mid_top_right_pt).end(model.mid_bottom_left_pt).color(RED);
+    draw.line().start(model.mid_bottom_right_pt).end(model.mid_top_left_pt).color(RED);
+
+    // draw.background().color(rgba(0.0, 0.0, 0.0, 0.05));
     //
     // draw.ellipse().x_y(0.0, 0.0).radius(150.0).color(rgba(1.0, 0.0, 0.0, 0.95));
     // draw.ellipse().x_y(100.0, 100.0).radius(150.0).color(rgba(0.0, 1.0, 0.0, 0.05));

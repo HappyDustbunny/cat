@@ -9,6 +9,17 @@ fn main() {
 }
 
 struct Model {
+    // Rhombe corners
+    top_pt:  Vector2,
+    bottom_pt: Vector2,
+    right_pt:  Vector2,
+    left_pt:  Vector2,
+    mid_top_right_pt:  Vector2,
+    mid_top_left_pt:  Vector2,
+    mid_bottom_right_pt:  Vector2,
+    mid_bottom_left_pt:  Vector2,
+    center_pt:  Vector2,
+
     _window: WindowId,
 }
 
@@ -23,7 +34,57 @@ fn model(app: &App) -> Model {
     // .view(view)
     .build()
     .unwrap();
-    Model { _window }
+
+    let top_pt = Vector2::new(100.0, 50.0);
+    let bottom_pt = Vector2::new(100.0, -50.0);
+    let right_pt = Vector2::new(0.0, 0.0);
+    let left_pt = Vector2::new(200.0, 0.0);
+    let mid_top_right_pt = Vector2::new(150.0, 25.0);
+    let mid_top_left_pt = Vector2::new(50.0, 25.0);
+    let mid_bottom_right_pt = Vector2::new(150.0, -25.0);
+    let mid_bottom_left_pt = Vector2::new(50.0, -25.0);
+    let center_pt = Vector2::new(100.0, 0.0);
+
+    Model {top_pt,
+        bottom_pt,
+        right_pt,
+        left_pt,
+        mid_top_right_pt,
+        mid_top_left_pt,
+        mid_bottom_right_pt,
+        mid_bottom_left_pt,
+        center_pt,
+
+        _window }
+}
+
+fn draw_rhombe(app: &App, model: &mut Model) {
+    let draw = app.draw();
+
+    draw.line().start(model.top_pt).end(model.right_pt).color(RED);
+    draw.line().start(model.right_pt).end(model.bottom_pt).color(RED);
+    draw.line().start(model.bottom_pt).end(model.left_pt).color(RED);
+    draw.line().start(model.left_pt).end(model.top_pt).color(RED);
+    draw.line().start(model.mid_top_right_pt).end(model.mid_bottom_left_pt).color(RED);
+    draw.line().start(model.mid_bottom_right_pt).end(model.mid_top_left_pt).color(RED);
+}
+
+fn contract_to(app: &App, model: &mut Model, left_point: Vector2) {
+    let new_top = left_point + (model.top_pt - left_point) / 2.0;
+    let new_bottom = left_point + (model.bottom_pt - left_point) / 2.0;
+    let new_right = left_point + (model.right_pt - left_point) / 2.0;
+
+    model.left_pt = left_point;
+    model.right_pt = new_right;
+    model.top_pt = new_top;
+    model.bottom_pt = new_bottom;
+    model.mid_top_left_pt = left_point + (new_top - left_point) / 2.0;
+    model.mid_top_right_pt = new_right + (new_top - new_right) / 2.0;
+    model.mid_bottom_left_pt = left_point + (new_bottom - left_point) / 2.0;
+    model.mid_bottom_right_pt = new_right + (new_bottom - new_right) / 2.0;
+    model.center_pt = left_point + (new_right - left_point) / 2.0;
+
+    draw_rhombe(app, model);
 }
 
 // fn current_monitor() {
@@ -33,9 +94,11 @@ fn model(app: &App) -> Model {
 fn event(_app: &App, _model: &mut Model, event: WindowEvent) {
     match event {
         KeyPressed(_key) => {
+            draw_rhombe(_app, _model);
             _app.main_window().set_cursor_position(100, 200).unwrap();
         }
         KeyReleased(_key) => {
+            contract_to(_app, _model, _model.left_pt);
             _app.main_window().set_cursor_position(200, 100).unwrap();
         }
         // Mouse events

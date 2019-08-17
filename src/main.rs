@@ -26,9 +26,9 @@ struct Model {
 fn model(app: &App) -> Model {
     let _window = app
     .new_window()
-    .with_transparency(true)
-    .event(event)
-    // .key_pressed(key_pressed)
+    // .with_transparency(true)
+    // .event(event)
+    .key_pressed(key_pressed)
     // .with_fullscreen(monitor)
     // .with_title("Fern")
     // .view(view)
@@ -37,8 +37,8 @@ fn model(app: &App) -> Model {
 
     let top_pt = Vector2::new(100.0, 50.0);
     let bottom_pt = Vector2::new(100.0, -50.0);
-    let right_pt = Vector2::new(0.0, 0.0);
-    let left_pt = Vector2::new(200.0, 0.0);
+    let right_pt = Vector2::new(200.0, 0.0);
+    let left_pt = Vector2::new(0.0, 0.0);
     let mid_top_right_pt = Vector2::new(150.0, 25.0);
     let mid_top_left_pt = Vector2::new(50.0, 25.0);
     let mid_bottom_right_pt = Vector2::new(150.0, -25.0);
@@ -76,6 +76,8 @@ fn contract_to(model: &mut Model, left_point: Vector2) {
     let new_bottom = left_point + (model.bottom_pt - left_point) / 2.0;
     let new_right = left_point + (model.right_pt - left_point) / 2.0;
 
+    println!("{:?} {:?} {:?} {:?}", left_point, new_top, new_bottom, new_right);
+
     model.left_pt = left_point;
     model.right_pt = new_right;
     model.top_pt = new_top;
@@ -93,49 +95,62 @@ fn contract_to(model: &mut Model, left_point: Vector2) {
 //     MonitorID
 // }
 //
-fn event(_app: &App, _model: &mut Model, event: WindowEvent) {
-    match event {
-        KeyPressed(_key) => {
-            _app.main_window().set_cursor_position(100, 200).unwrap();
-        }
-        KeyReleased(_key) => {
-            contract_to(_model, _model.left_pt);
-            _app.main_window().set_cursor_position(200, 100).unwrap();
-        }
-        // // Mouse events
-        // MouseMoved(_pos) => {}
-        // MousePressed(_button) => {}
-        // MouseReleased(_button) => {}
-        // MouseWheel(_amount, _phase) => {}
-        // MouseEntered => {}
-        // MouseExited => {}
-        //
-        // // Touch events
-        // Touch(_touch) => {}
-        // TouchPressure(_pressure) => {}
-        //
-        // // Window events
-        // Moved(_pos) => {}
-        // Resized(_size) => {}
-        // HoveredFile(_path) => {}
-        // DroppedFile(_path) => {}
-        // HoveredFileCancelled => {}
-        // Focused => {}
-        // Unfocused => {}
-        // Closed => {}
-        _other => {}
-    }
-
-}
+// fn event(_app: &App, _model: &mut Model, event: WindowEvent) {
+//     match event {
+//         KeyPressed(_key) => {
+//             _app.main_window().set_cursor_position(100, 200).unwrap();
+//         }
+//         KeyReleased(_key) => {
+//             contract_to(_model, _model.left_pt);
+//             _app.main_window().set_cursor_position(200, 100).unwrap();
+//         }
+//         // // Mouse events
+//         // MouseMoved(_pos) => {}
+//         // MousePressed(_button) => {}
+//         // MouseReleased(_button) => {}
+//         // MouseWheel(_amount, _phase) => {}
+//         // MouseEntered => {}
+//         // MouseExited => {}
+//         //
+//         // // Touch events
+//         // Touch(_touch) => {}
+//         // TouchPressure(_pressure) => {}
+//         //
+//         // // Window events
+//         // Moved(_pos) => {}
+//         // Resized(_size) => {}
+//         // HoveredFile(_path) => {}
+//         // DroppedFile(_path) => {}
+//         // HoveredFileCancelled => {}
+//         // Focused => {}
+//         // Unfocused => {}
+//         // Closed => {}
+//         _other => {}
+//     }
+//
+// }
 
 // fn window_event(_app: &App, _model: &mut Model, event: WindowEvent) {
 //     if let KeyPressed(_key);
 // }
 //
-// fn key_pressed(_app: &App, _model: &mut Model, _key: Key) {
-//     _app.main_window().set_cursor_position(100, 200).unwrap();
-//
-// }
+fn key_pressed(_app: &App, _model: &mut Model, key: Key) {
+    match key {
+        Key::A => {
+            contract_to(_model, _model.left_pt);
+        }
+        Key::D => {
+            contract_to(_model, _model.center_pt);
+        }
+        Key::S => {
+            contract_to(_model, _model.mid_bottom_left_pt);
+        }
+        Key::W => {
+            contract_to(_model, _model.mid_top_left_pt);
+        }
+        _other => {}
+    }
+}
 
 
 fn view(app: &App, model: &Model, frame: &Frame) {

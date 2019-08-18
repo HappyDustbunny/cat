@@ -26,6 +26,7 @@ struct Model {
 fn model(app: &App) -> Model {
     let _window = app
     .new_window()
+    .with_dimensions(500,250)
     // .with_transparency(true)
     // .event(event)
     .key_pressed(key_pressed)
@@ -35,15 +36,20 @@ fn model(app: &App) -> Model {
     .build()
     .unwrap();
 
-    let top_pt = Vector2::new(100.0, 50.0);
-    let bottom_pt = Vector2::new(100.0, -50.0);
-    let right_pt = Vector2::new(200.0, 0.0);
-    let left_pt = Vector2::new(0.0, 0.0);
-    let mid_top_right_pt = Vector2::new(150.0, 25.0);
-    let mid_top_left_pt = Vector2::new(50.0, 25.0);
-    let mid_bottom_right_pt = Vector2::new(150.0, -25.0);
-    let mid_bottom_left_pt = Vector2::new(50.0, -25.0);
-    let center_pt = Vector2::new(100.0, 0.0);
+    let win = app.window_rect();
+
+    let diagonal_up = win.top_right() - win.bottom_left();
+    let diagonal_down = win.top_left() - win.bottom_right();
+
+    let top_pt = win.top_left() + diagonal_up/2.0;
+    let right_pt = top_pt - diagonal_down;
+    let bottom_pt = right_pt - diagonal_up;
+    let left_pt = bottom_pt + diagonal_down;
+    let mid_top_left_pt = win.top_left();
+    let mid_top_right_pt = win.top_right();
+    let mid_bottom_left_pt = win.bottom_left();
+    let mid_bottom_right_pt = win.bottom_right();
+    let center_pt = win.bottom_left() + diagonal_up/2.0;
 
     Model {top_pt,
         bottom_pt,
@@ -57,26 +63,28 @@ fn model(app: &App) -> Model {
 
         _window }
 }
-//
-// fn draw_rhombe(draw: &app::Draw, model: &mut Model) {
-//     // let draw = app.draw();
-//
-//     draw.line().start(model.top_pt).end(model.right_pt).color(RED);
-//     draw.line().start(model.right_pt).end(model.bottom_pt).color(RED);
-//     draw.line().start(model.bottom_pt).end(model.left_pt).color(RED);
-//     draw.line().start(model.left_pt).end(model.top_pt).color(RED);
-//     draw.line().start(model.mid_top_right_pt).end(model.mid_bottom_left_pt).color(RED);
-//     draw.line().start(model.mid_bottom_right_pt).end(model.mid_top_left_pt).color(RED);
-//
-//     println!("rap");
-// }
+
+fn reset_rhombe(app: &App, model: &mut Model) {
+    let win = app.window_rect();
+
+    let diagonal_up = win.top_right() - win.bottom_left();
+    let diagonal_down = win.top_left() - win.bottom_right();
+
+    model.top_pt = win.top_left() + diagonal_up/2.0;
+    model.right_pt = model.top_pt - diagonal_down;
+    model.bottom_pt = model.right_pt - diagonal_up;
+    model.left_pt = model.bottom_pt + diagonal_down;
+    model.mid_top_left_pt = win.top_left();
+    model.mid_top_right_pt = win.top_right();
+    model.mid_bottom_left_pt = win.bottom_left();
+    model.mid_bottom_right_pt = win.bottom_right();
+    model.center_pt = win.bottom_left() + diagonal_up/2.0;
+}
 
 fn contract_to(model: &mut Model, left_point: Vector2) {
-    let new_top = left_point + (model.top_pt - left_point) / 2.0;
-    let new_bottom = left_point + (model.bottom_pt - left_point) / 2.0;
-    let new_right = left_point + (model.right_pt - left_point) / 2.0;
-
-    println!("{:?} {:?} {:?} {:?}", left_point, new_top, new_bottom, new_right);
+    let new_top = left_point + (model.top_pt - model.left_pt) / 2.0;
+    let new_bottom = left_point + (model.bottom_pt - model.left_pt) / 2.0;
+    let new_right = left_point + (model.right_pt - model.left_pt) / 2.0;
 
     model.left_pt = left_point;
     model.right_pt = new_right;
@@ -87,8 +95,6 @@ fn contract_to(model: &mut Model, left_point: Vector2) {
     model.mid_bottom_left_pt = left_point + (new_bottom - left_point) / 2.0;
     model.mid_bottom_right_pt = new_right + (new_bottom - new_right) / 2.0;
     model.center_pt = left_point + (new_right - left_point) / 2.0;
-
-    // draw_rhombe(draw, model);
 }
 
 // fn current_monitor() {
@@ -147,6 +153,12 @@ fn key_pressed(_app: &App, _model: &mut Model, key: Key) {
         }
         Key::W => {
             contract_to(_model, _model.mid_top_left_pt);
+        }
+        Key::Space => {
+            let pos = _model.center_pt + _model.mid_top_left_pt;
+            _app.main_window().set_cursor_position(pos.x as i32, pos.y as i32).expect("Oups");
+            println!("{:?} {:?} {:?}", _model.center_pt, _model.mid_top_left_pt, pos  );
+            reset_rhombe(_app, _model)
         }
         _other => {}
     }

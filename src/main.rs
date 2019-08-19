@@ -1,3 +1,9 @@
+// CAT (Cross Aiming Tool if you'd like it to be an acronym) is a keyboard pointer with the
+// purpose of minimizing the use of the mouse while typing.
+// The screen is divided in four sectors and one sector is chosen with the <a><d><s><w> arrow keys.
+// The chosen sector is divided in four, a sector is chosen etc. When <spacebar> is pressed the
+// mousepointer is placed at the intersection of the cross.
+
 use nannou::prelude::*;
 
 fn main() {
@@ -141,6 +147,8 @@ fn contract_to(model: &mut Model, left_point: Vector2) {
 // }
 //
 fn key_pressed(_app: &App, _model: &mut Model, key: Key) {
+    let win = _app.window_rect();
+
     match key {
         Key::A => {
             contract_to(_model, _model.left_pt);
@@ -155,9 +163,10 @@ fn key_pressed(_app: &App, _model: &mut Model, key: Key) {
             contract_to(_model, _model.mid_top_left_pt);
         }
         Key::Space => {
-            let pos = _model.center_pt + _model.mid_top_left_pt;
-            _app.main_window().set_cursor_position(pos.x as i32, pos.y as i32).expect("Oups");
-            println!("{:?} {:?} {:?}", _model.center_pt, _model.mid_top_left_pt, pos  );
+            let pos_x = _model.center_pt.x + win.top_right().x;
+            let pos_y = -(_model.center_pt.y - win.top_right().y);
+            _app.main_window().set_cursor_position(pos_x as i32, pos_y as i32).expect("Oups");
+            println!("{:?} {:?} {:?} {:?}", _model.center_pt, win.top_right(), pos_x, pos_y);
             reset_rhombe(_app, _model)
         }
         _other => {}

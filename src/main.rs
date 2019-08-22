@@ -25,6 +25,7 @@ struct Model {
     mid_bottom_right_pt:  Vector2,
     mid_bottom_left_pt:  Vector2,
     center_pt:  Vector2,
+    zoom: u8,
 
     _window: WindowId,
 }
@@ -32,7 +33,8 @@ struct Model {
 fn model(app: &App) -> Model {
     let _window = app
     .new_window()
-    .with_fullscreen(true)
+    .with_dimensions(500, 500)
+    // .with_fullscreen(true)
     // .with_transparency(true)
     // .event(event)
     .key_pressed(key_pressed)
@@ -56,6 +58,7 @@ fn model(app: &App) -> Model {
     let mid_bottom_left_pt = win.bottom_left();
     let mid_bottom_right_pt = win.bottom_right();
     let center_pt = win.bottom_left() + diagonal_up/2.0;
+    let zoom = 0;
 
     Model {top_pt,
         bottom_pt,
@@ -66,6 +69,7 @@ fn model(app: &App) -> Model {
         mid_bottom_right_pt,
         mid_bottom_left_pt,
         center_pt,
+        zoom,
 
         _window }
 }
@@ -85,9 +89,10 @@ fn reset_rhombe(app: &App, model: &mut Model) {
     model.mid_bottom_left_pt = win.bottom_left();
     model.mid_bottom_right_pt = win.bottom_right();
     model.center_pt = win.bottom_left() + diagonal_up/2.0;
+    model.zoom = 0;
 }
 
-fn contract_to(model: &mut Model, left_point: Vector2) {
+fn contract_to(app: &App, model: &mut Model, left_point: Vector2) {
     let new_top = left_point + (model.top_pt - model.left_pt) / 2.0;
     let new_bottom = left_point + (model.bottom_pt - model.left_pt) / 2.0;
     let new_right = left_point + (model.right_pt - model.left_pt) / 2.0;
@@ -101,6 +106,11 @@ fn contract_to(model: &mut Model, left_point: Vector2) {
     model.mid_bottom_left_pt = left_point + (new_bottom - left_point) / 2.0;
     model.mid_bottom_right_pt = new_right + (new_bottom - new_right) / 2.0;
     model.center_pt = left_point + (new_right - left_point) / 2.0;
+    model.zoom += 1;
+
+    if model.zoom > 10 {
+        reset_rhombe(app, model)
+    }
 }
 
 // fn current_monitor() {
@@ -149,18 +159,20 @@ fn contract_to(model: &mut Model, left_point: Vector2) {
 fn key_pressed(_app: &App, _model: &mut Model, key: Key) {
     let win = _app.window_rect();
 
+    println!("{:?} {:?}", _model.left_pt.x, win.top_left().x);
+
     match key {
-        Key::A => {
-            contract_to(_model, _model.left_pt);
+        Key::A if _model.left_pt.x >= win.top_left().x || _model.zoom < 1 => {
+            contract_to(_app, _model, _model.left_pt);
         }
-        Key::D => {
-            contract_to(_model, _model.center_pt);
+        Key::D if _model.right_pt.x <= win.top_right().x || _model.zoom < 1 => {
+            contract_to(_app, _model, _model.center_pt);
         }
-        Key::S => {
-            contract_to(_model, _model.mid_bottom_left_pt);
+        Key::S if _model.bottom_pt.y >= win.bottom_left().y || _model.zoom < 1 => {
+            contract_to(_app, _model, _model.mid_bottom_left_pt);
         }
-        Key::W => {
-            contract_to(_model, _model.mid_top_left_pt);
+        Key::W if _model.top_pt.y <= win.top_left().y || _model.zoom < 1 => {
+            contract_to(_app, _model, _model.mid_top_left_pt);
         }
         Key::Space => {
             let pos_x = _model.center_pt.x + win.top_right().x;

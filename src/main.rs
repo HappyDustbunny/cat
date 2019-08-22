@@ -32,7 +32,7 @@ struct Model {
 fn model(app: &App) -> Model {
     let _window = app
     .new_window()
-    .with_dimensions(500,250)
+    .with_fullscreen(true)
     // .with_transparency(true)
     // .event(event)
     .key_pressed(key_pressed)
